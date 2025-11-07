@@ -1,8 +1,10 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import Image from "next/image";
+
+import { WalletConnect } from "./components/WalletConnect";
 
 export default function Home() {
   return (
-    <ConnectButton />
+    <>
+    <WalletConnect />
+    </>
   );
 }
