@@ -1,10 +1,11 @@
-
-import { WalletConnect } from "./components/WalletConnect";
+import {AirdropForm} from "./components/AirdropForm"
 
 export default function Home() {
   return (
     <>
-    <WalletConnect />
+    <AirdropForm>
+
+    </AirdropForm>
     </>
   );
 }

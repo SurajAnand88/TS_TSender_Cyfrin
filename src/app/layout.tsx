@@ -4,6 +4,7 @@ import "./globals.css";
 import { ReactNode } from "react";
 import { Providers } from "./providers";
 import { propagateServerField } from "next/dist/server/lib/render-server";
+import { Header } from "./components/Header";
 
 
 export default function RootLayout(props:{children:ReactNode}) {
@@ -11,6 +12,7 @@ export default function RootLayout(props:{children:ReactNode}) {
     <html lang="en">
       <body> 
         <Providers>
+          <Header />
           {props.children}
         </Providers>
       </body>
