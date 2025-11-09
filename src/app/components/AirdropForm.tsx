@@ -14,6 +14,12 @@ export function AirdropForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // handle form submission
+    const inputAddreesses = addresses.split(",").map(ele=>ele.trim());
+    const inputAmount = amount.split(",").map(ele=>ele.trim());
+
+    console.log(inputAddreesses);
+    console.log(inputAmount);
+    
   }
 
   return (
