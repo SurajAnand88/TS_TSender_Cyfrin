@@ -10,6 +10,7 @@
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.2.9",
     "@tanstack/react-query": "^5.90.7",
+    "@wagmi/core": "^2.22.1",
     "dotenv": "^17.2.3",
     "next": "16.0.1",
     "react": "19.2.0",

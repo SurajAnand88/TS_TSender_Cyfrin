@@ -1,25 +1,52 @@
 "use client"
 
 import { useState } from "react"
-import {AddressesInput} from "./ui/AddressesInput"
-import {AmountInput} from "./ui/AmountInput"
-import {TokenAddressInput} from "./ui/TokenAddressInput"
+import { AddressesInput } from "./ui/AddressesInput"
+import { AmountInput } from "./ui/AmountInput"
+import { TokenAddressInput } from "./ui/TokenAddressInput"
+import { useChainId, useConfig, useAccount } from 'wagmi';
+import { readContract } from "@wagmi/core"
+import { erc20ABI, tSenderContract, ERC20Contract, abi } from "../constants/constants"
+
+
 
 
 export function AirdropForm() {
   const [tokenAddress, setTokenAddress] = useState("")
   const [addresses, setAddresses] = useState("")
   const [amount, setAmount] = useState("")
+  const chainId = useChainId();
+  const config = useConfig();
+  const account = useAccount();
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  async function getApprovedAmount(tSenderAddress: string | null): Promise<number> {
+    if (!tSenderAddress) {
+      alert("Please use the supported chain");
+      return 0;
+    }
+
+    const response = await readContract(config, {
+      abi: erc20ABI,
+      address: tokenAddress as `0x${string}`,
+      functionName: 'allowance',
+      args: [account.address, tSenderContract as `0x${string}`]
+    })
+
+    return response as number;
+
+
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     // handle form submission
-    const inputAddreesses = addresses.split(",").map(ele=>ele.trim());
-    const inputAmount = amount.split(",").map(ele=>ele.trim());
+    const inputAddreesses = addresses.split(",").map(ele => ele.trim());
+    const inputAmount = amount.split(",").map(ele => ele.trim());
 
-    console.log(inputAddreesses);
-    console.log(inputAmount);
-    
+    console.log(account.address)
+    const approvedAmount = await getApprovedAmount(tSenderContract);
+    console.log(approvedAmount)
   }
 
   return (

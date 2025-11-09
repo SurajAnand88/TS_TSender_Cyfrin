@@ -9,7 +9,7 @@ export function AmountInput({ value, onChange }: { value: string; onChange: (v: 
       </label>
       <textarea
         id="amount"
-        rows={6}
+        rows={4}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Enter amount seprated by commas"
