@@ -11,7 +11,6 @@ export function Header() {
         <FaGithub className="text-gray-800 text-2xl" />
         <span className="text-xl font-semibold text-black">TSender</span>
       </div>
-
       <ConnectButton />
     </header>
     </div>
