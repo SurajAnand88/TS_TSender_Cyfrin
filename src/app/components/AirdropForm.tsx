@@ -141,13 +141,13 @@ export function AirdropForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-xl mx-auto p-4 border-solid border-3 rounded-lg border-blue-500 px-8 py-8 mt-25"
+      className="max-w-lg mx-auto p-4 border-solid border-3 rounded-lg border-blue-500 px-8 py-8 mt-23"
     >
       <Title></Title>
       <TokenAddressInput value={tokenAddress} onChange={setTokenAddress} />
       <AddressesInput value={addresses} onChange={setAddresses} />
       <AmountInput value={amount} onChange={setAmount} />
-      <TDetails tName="Mock20" wAmnt="10000" totalToken={1000}/>
+      {tokenAddress && addresses && amount?<TDetails tName="Mock20" wAmnt="10000" totalToken={1000}/>:null}
       <button
         type="submit"
         className="mt-4 w-full rounded-md bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
