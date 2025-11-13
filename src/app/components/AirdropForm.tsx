@@ -20,9 +20,9 @@ import { TDetails } from "./ui/TDetails";
 
 
 export function AirdropForm() {
-  const [tokenAddress, setTokenAddress] = useState("");
-  const [addresses, setAddresses] = useState("");
-  const [amount, setAmount] = useState("");
+  const [tokenAddress, setTokenAddress] = useState(localStorage.getItem("tokenAddress")||"");
+  const [addresses, setAddresses] = useState(localStorage.getItem("addresses")||"");
+  const [amount, setAmount] = useState(localStorage.getItem("amount")||"");
   const chainId = useChainId();
   const config = useConfig();
   const account = useAccount();
@@ -31,11 +31,15 @@ export function AirdropForm() {
     [amount]
   );
   const { data: hash, isPending, writeContractAsync } = useWriteContract();
-  const [btn, setBtn] = useState(account.isConnected ? "Send Tokens" : "Please Connect Wallet")
+  const [btn, setBtn] = useState("Send Tokens")
 
   // useEffect(()=>{
   //   console.log("useEffect runs");
   // },[btn])
+
+  // function setToLocalStorage(value,setValue){
+     
+  // }
 
   function clearFormData(): void {
     setTokenAddress("");

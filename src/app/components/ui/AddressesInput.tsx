@@ -1,5 +1,7 @@
 "use client"
 
+import { setToLocalStorage } from "@/app/constants/setToLocalStorage/setToLocalStorage";
+
 export function AddressesInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <div className="">
@@ -9,7 +11,7 @@ export function AddressesInput({ value, onChange }: { value: string; onChange: (
       <textarea
         id="addresses"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => setToLocalStorage(e,onChange)}
         placeholder="Enter multiple wallet addresses separated by commas"
         rows={2}
         className="w-full text-xs h-20 text-black placeholder-gray-600 rounded-md border border-gray-300 px-4 py-2 overflow-y-scroll resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 
