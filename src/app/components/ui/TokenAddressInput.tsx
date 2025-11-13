@@ -2,7 +2,7 @@
 
 import { setToLocalStorage } from "@/app/constants/setToLocalStorage/setToLocalStorage";
 
-export function TokenAddressInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+export function TokenAddressInput({ value, onChange }: { value: string; onChange: (v: string) => void}) {
 
  
 

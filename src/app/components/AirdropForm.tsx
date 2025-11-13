@@ -16,13 +16,16 @@ import Title from "./ui/Title";
 import { calculateTotalAmount } from "../constants/calculateTotalAmount/calculateTotalAmount";
 import { isAddress } from "viem";
 import { TDetails } from "./ui/TDetails";
+import { formatEther } from "viem";
 
 
 
 export function AirdropForm() {
-  const [tokenAddress, setTokenAddress] = useState(localStorage.getItem("tokenAddress")||"");
-  const [addresses, setAddresses] = useState(localStorage.getItem("addresses")||"");
-  const [amount, setAmount] = useState(localStorage.getItem("amount")||"");
+  const [tokenAddress, setTokenAddress] = useState(localStorage.getItem("tokenAddress") || "");
+  const [addresses, setAddresses] = useState(localStorage.getItem("addresses") || "");
+  const [amount, setAmount] = useState(localStorage.getItem("amount") || "");
+  const [tokenSymbol, setTokenSymbol] = useState("");
+  const [totalInWei,setTotalInWei] = useState(0)
   const chainId = useChainId();
   const config = useConfig();
   const account = useAccount();
@@ -33,18 +36,30 @@ export function AirdropForm() {
   const { data: hash, isPending, writeContractAsync } = useWriteContract();
   const [btn, setBtn] = useState("Send Tokens")
 
-  // useEffect(()=>{
-  //   console.log("useEffect runs");
-  // },[btn])
 
-  // function setToLocalStorage(value,setValue){
-     
-  // }
+  useEffect(() => {
+    getTokenSymbol();
+  }, [tokenAddress])
+
+  useEffect( ()=>{
+    const total:number = calculateTotalAmount(amount);
+    setTotalInWei(total);
+  },[amount])
 
   function clearFormData(): void {
     setTokenAddress("");
     setAddresses("");
     setAmount("");
+  }
+
+  async function getTokenSymbol(): Promise<void> {
+    const symbol = await readContract(config, {
+      abi: erc20ABI,
+      address: tokenAddress as `0x${string}`,
+      functionName: "symbol"
+    })
+    
+    setTokenSymbol(symbol as string);
   }
 
   async function getApprovedAmount(
@@ -64,7 +79,6 @@ export function AirdropForm() {
     });
 
 
-    console.log(response);
 
     return response as number;
   }
@@ -151,7 +165,8 @@ export function AirdropForm() {
       <TokenAddressInput value={tokenAddress} onChange={setTokenAddress} />
       <AddressesInput value={addresses} onChange={setAddresses} />
       <AmountInput value={amount} onChange={setAmount} />
-      {tokenAddress && addresses && amount?<TDetails tName="Mock20" wAmnt="10000" totalToken={1000}/>:null}
+      {tokenAddress && addresses && amount ? <TDetails tName={tokenSymbol} wAmnt={totalInWei} totalToken={formatEther(BigInt(totalInWei))} /> : null}
+      {/* <h1 className="w-full rounded-md border-gray-800 text-black bg-gray-300 text-center" onClick={() => getApprovedAmount(tSenderContract)}>getName</h1> */}
       <button
         type="submit"
         className="mt-4 w-full rounded-md bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"

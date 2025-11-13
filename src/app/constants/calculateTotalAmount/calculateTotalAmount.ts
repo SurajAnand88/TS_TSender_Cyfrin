@@ -1,4 +1,4 @@
-export async function calculateTotalAmount(amounts: string): Promise<number> {
+export function calculateTotalAmount(amounts: string): number {
   const amountArray: number[] = amounts
     .split(/[\n,]+/)
     .map((ele) => parseFloat(ele.trim()))
