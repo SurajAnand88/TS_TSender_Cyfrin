@@ -78,16 +78,12 @@ export function AirdropForm() {
       args: [account.address, tSenderContract as `0x${string}`],
     });
 
-
-
     return response as number;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // handle form submission
-
-    console.log(account)
     setBtn(account.isConnected ? "Reading Contract...." : "Please connect Account")
     const approvedAmount = await getApprovedAmount(tSenderContract);
 
