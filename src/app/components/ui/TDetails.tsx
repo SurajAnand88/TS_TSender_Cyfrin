@@ -11,7 +11,7 @@ export function TDetails({tName,wAmnt,totalToken}:{tName:string,wAmnt:number,tot
             <div className="flex flex-col text-xs space-y-2 text-gray-700">
                 <div className="flex justify-between">
                     <span className="font-medium">Token Name:</span>
-                    <span>{tName?tName:"Invalid Address"}</span>
+                    <span>{tName}</span>
                 </div>
 
                 <div className="flex justify-between">
