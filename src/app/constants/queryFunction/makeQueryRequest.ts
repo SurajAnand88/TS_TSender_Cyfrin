@@ -1,17 +1,27 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-export function makeQueryRequest({
+ function useWriteContractMutation({
+  mutationFn,
+  addressArray,
+  amountArray,
+  totalAmount,
+}: {
+  mutationFn: ({addressArray,amountArray,totalAmount}:{addressArray?:string[],amountArray?:number[],totalAmount?:number}) => Promise<any>;
+  addressArray?: string[];
+  amountArray?: number[];
+  totalAmount?: number;
+}) {
+  return useMutation({ mutationFn });
+}
+
+function useReadContractQuery({
   queryFn,
   queryKey,
-  enabled = true,
 }: {
   queryFn: () => Promise<any>;
   queryKey: string;
-  enabled?: boolean;
 }) {
-  return useQuery({
-    queryKey: [queryKey],
-    queryFn: queryFn,
-    enabled: enabled,
-  });
+  return useQuery({ queryFn, queryKey: [queryKey] });
 }
+
+export { useReadContractQuery, useWriteContractMutation };

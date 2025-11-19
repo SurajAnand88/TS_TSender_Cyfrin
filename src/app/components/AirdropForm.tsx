@@ -19,6 +19,7 @@ import { TDetails } from "./ui/TDetails";
 import { formatEther } from "viem";
 import { useQuery } from "@tanstack/react-query";
 import { convertStringToAddressArray, convertStringToNumbersArray } from "../constants/covertStringToArray/convert";
+import { useReadContractQuery, useWriteContractMutation } from "../constants/queryFunction/makeQueryRequest";
 
 
 
@@ -28,6 +29,8 @@ export function AirdropForm() {
   const [tokenAddress, setTokenAddress] = useState(localStorage.getItem("tokenAddress") || "");
   const [addresses, setAddresses] = useState(localStorage.getItem("addresses") || "");
   const [amount, setAmount] = useState(localStorage.getItem("amount") || "");
+  const [addressArray, setAddressArray] = useState<string[]>([]);
+  const [amountArray, setAmountArray] = useState<number[]>([]);
   const [btn, setBtn] = useState("Send Tokens")
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [totalInWei, setTotalInWei] = useState(0)
@@ -38,35 +41,65 @@ export function AirdropForm() {
     () => calculateTotalAmount(amount),
     [amount]
   );
+
+  const clearFormData = (): void => {
+    setBtn("Send Tokens")
+    setTokenAddress("");
+    setAddresses("")
+    setAmount("")
+  }
+
+  const getSymbol = async () => {
+    return await readContract(config, {
+      abi: erc20ABI,
+      address: tokenAddress as `0x${string}`,
+      functionName: "symbol"
+    })
+  }
+
+  const approveAmountWrite = async ({ totalAmount }: { totalAmount?: number }) => {
+    console.log(totalAmount)
+    return await writeContractAsync({
+      abi: erc20ABI,
+      address: ERC20Contract as `0x${string}`,
+      functionName: "approve",
+      args: [tSenderContract as `0x${string}`, BigInt(totalAmount ? totalAmount : 0)],
+    });
+  }
+
+  const sendTokens = async ({ addressArray, amountArray }: { addressArray?: string[], amountArray?: number[] }) => {
+    return await writeContractAsync({
+      abi,
+      address: tSenderContract as `0x${string}`,
+      functionName: "sendTokens",
+      args: [ERC20Contract as `0x${string}`, addressArray, amountArray],
+    });
+  }
+
   const { data: hash, isPending, writeContractAsync } = useWriteContract();
-
-  const { data: symbol, isLoading, isError } = useQuery({
-    queryKey: ['tokenSymbol', tokenAddress],
-    queryFn: async () => {
-      return await readContract(config, {
-        abi: erc20ABI,
-        address: tokenAddress as `0x${string}`,
-        functionName: "symbol"
-      })
-    }
-  })
-
+  const { data: symbol, isLoading, isError } = useReadContractQuery({ queryFn: getSymbol, queryKey: tokenAddress });
+  const approveTransaction = useWriteContractMutation({ mutationFn: approveAmountWrite, totalAmount: totalAmount })
+  const sendTransaction = useWriteContractMutation({ mutationFn: sendTokens, addressArray: addressArray, amountArray: amountArray })
+  const { data: sendHash, isError: isErrorSendTokens, isPending: isPendingSendTokens, isSuccess: isSuccessSendTokens } = sendTransaction;
+  const { data: approveHash, isPending: isPendingApprove, isError: isErrorApprove, isSuccess: isSuccessApproveTransaction } = approveTransaction;
 
   useEffect(() => {
     const total: number = calculateTotalAmount(amount);
     setTotalInWei(total);
   }, [amount])
 
-  function clearFormData(): void {
-    setTokenAddress("");
-    setAddresses("");
-    setAmount("");
-  }
+  useEffect(() => {
+    if (isPendingApprove) setBtn("Approving...");
+    if (isPendingSendTokens) setBtn("Sending Tokens...");
+    if (isErrorApprove || isErrorSendTokens) setBtn("Err : See Console")
+  }, [isErrorApprove, isPendingApprove, isPendingSendTokens, isErrorSendTokens, isSuccessApproveTransaction, isSuccessSendTokens])
+
 
 
   async function getApprovedAmount(
     tSenderAddress: string | null
   ): Promise<number> {
+
     if (!tSenderAddress) {
       alert("Please use the supported chain");
       return 0;
@@ -85,41 +118,71 @@ export function AirdropForm() {
     e.preventDefault();
     // handle form submission
     const approvedAmount = await getApprovedAmount(tSenderContract);
-    
+    console.log("approve amount ", approvedAmount,)
+
     if (approvedAmount < totalAmount) {
       setBtn("Approve")
-      const approveHash = await writeContractAsync({
-        abi: erc20ABI,
-        address: ERC20Contract as `0x${string}`,
-        functionName: "approve",
-        args: [tSenderContract as `0x${string}`, BigInt(totalAmount)],
-      });
+      setAmountArray([...convertStringToNumbersArray(amount)])
+      setAddressArray([...convertStringToAddressArray(addresses)])
+      approveTransaction.mutate({ totalAmount }, {
+        onSuccess: async (approveHash) => {
+          console.log("Approval Success", approveHash);
 
-      
-      const receipt = await waitForTransactionReceipt(config, {
-        hash: approveHash,
-      });
-      setBtn(receipt ? "Send Transaction" : "Err: See console")
+          const hashA = await waitForTransactionReceipt(config, {
+            hash: approveHash
+          })
+          if (hash) setBtn("Tokens Approved");
+
+          sendTransaction.mutate({ addressArray, amountArray }, {
+            onSuccess: async (sendHash) => {
+              const hashS = await waitForTransactionReceipt(config, {
+                hash: sendHash
+              })
+
+              if (hashS) setBtn("Tokens Sent")
+              console.log("Transaction Successful.....", sendHash)
+              setTimeout(() => { clearFormData() }, 5000)
+
+            },
+
+            onError: (error) => {
+              console.log("Transaction Error", error)
+              setTimeout(() => { clearFormData() }, 5000)
+            }
+          })
+        },
+        onError: (error) => {
+          console.log("Approval Error", error);
+        }
+      })
+
+      const hash = await waitForTransactionReceipt(config, {
+        hash: approveHash
+      })
+
+
+
+    } else {
+      setAmountArray([...convertStringToNumbersArray(amount)])
+      setAddressArray([...convertStringToAddressArray(addresses)])
+
+      sendTransaction.mutate({ addressArray, amountArray }, {
+        onSuccess: async (sendHash) => {
+          const hashS = await waitForTransactionReceipt(config, {
+            hash: sendHash
+          })
+
+          if (hashS) setBtn("Tokens Sent")
+          console.log("Transaction Successful.....", sendHash)
+          setTimeout(() => { clearFormData() }, 5000)
+        },
+        onError: (error) => {
+          console.log("Transaction Error", error)
+          setBtn("Transaction Dropped See Console")
+        }
+      })
     }
 
-
-    const amountArray: number[] = convertStringToNumbersArray(amount);
-
-    const addressArray: string[] = convertStringToAddressArray(addresses)
-
-    const sendHash = await writeContractAsync({
-      abi,
-      address: tSenderContract as `0x${string}`,
-      functionName: "sendTokens",
-      args: [ERC20Contract as `0x${string}`, addressArray, amountArray],
-    });
-
-
-    const sendReceipt = await waitForTransactionReceipt(config, {
-      hash: sendHash,
-    });
-
-    clearFormData();
   };
 
   return (
