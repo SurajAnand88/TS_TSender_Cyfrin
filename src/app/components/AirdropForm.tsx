@@ -19,7 +19,7 @@ import { TDetails } from "./ui/TDetails";
 import { formatEther } from "viem";
 import { useQuery } from "@tanstack/react-query";
 import { convertStringToAddressArray, convertStringToNumbersArray } from "../constants/covertStringToArray/convert";
-import { useReadContractQuery, useWriteContractMutation } from "../constants/queryFunction/makeQueryRequest";
+import { useReadContractQuery, useWriteContractMutation } from "../constants/queryFunction/queryRequest";
 
 
 
@@ -80,8 +80,8 @@ export function AirdropForm() {
   const { data: symbol, isLoading, isError } = useReadContractQuery({ queryFn: getSymbol, queryKey: tokenAddress });
   const approveTransaction = useWriteContractMutation({ mutationFn: approveAmountWrite, totalAmount: totalAmount })
   const sendTransaction = useWriteContractMutation({ mutationFn: sendTokens, addressArray: addressArray, amountArray: amountArray })
-  const { data: sendHash, isError: isErrorSendTokens, isPending: isPendingSendTokens, isSuccess: isSuccessSendTokens } = sendTransaction;
-  const { data: approveHash, isPending: isPendingApprove, isError: isErrorApprove, isSuccess: isSuccessApproveTransaction } = approveTransaction;
+  const { data: sendHash, isError: isErrorSendTokens, isPending: isPendingSendTokens } = sendTransaction;
+  const { data: approveHash, isPending: isPendingApprove, isError: isErrorApprove } = approveTransaction;
 
   useEffect(() => {
     const total: number = calculateTotalAmount(amount);
@@ -92,7 +92,7 @@ export function AirdropForm() {
     if (isPendingApprove) setBtn("Approving...");
     if (isPendingSendTokens) setBtn("Sending Tokens...");
     if (isErrorApprove || isErrorSendTokens) setBtn("Err : See Console")
-  }, [isErrorApprove, isPendingApprove, isPendingSendTokens, isErrorSendTokens, isSuccessApproveTransaction, isSuccessSendTokens])
+  }, [isErrorApprove, isPendingApprove, isPendingSendTokens, isErrorSendTokens])
 
 
 
