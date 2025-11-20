@@ -20,6 +20,7 @@ import { formatEther } from "viem";
 import { useQuery } from "@tanstack/react-query";
 import { convertStringToAddressArray, convertStringToNumbersArray } from "../constants/covertStringToArray/convert";
 import { useReadContractQuery, useWriteContractMutation } from "../constants/queryFunction/queryRequest";
+import { Spinner } from "./ui/Spinner";
 
 
 
@@ -88,13 +89,6 @@ export function AirdropForm() {
     setTotalInWei(total);
   }, [amount])
 
-  useEffect(() => {
-    if (isPendingApprove) setBtn("Approving...");
-    if (isPendingSendTokens) setBtn("Sending Tokens...");
-    if (isErrorApprove || isErrorSendTokens) setBtn("Err : See Console")
-  }, [isErrorApprove, isPendingApprove, isPendingSendTokens, isErrorSendTokens])
-
-
 
   async function getApprovedAmount(
     tSenderAddress: string | null
@@ -131,7 +125,7 @@ export function AirdropForm() {
           const hashA = await waitForTransactionReceipt(config, {
             hash: approveHash
           })
-          if (hash) setBtn("Tokens Approved");
+          if (hashA) setBtn("Tokens Approved");
 
           sendTransaction.mutate({ addressArray, amountArray }, {
             onSuccess: async (sendHash) => {
@@ -154,10 +148,6 @@ export function AirdropForm() {
         onError: (error) => {
           console.log("Approval Error", error);
         }
-      })
-
-      const hash = await waitForTransactionReceipt(config, {
-        hash: approveHash
       })
 
 
@@ -197,10 +187,14 @@ export function AirdropForm() {
       {tokenAddress && addresses && amount ? <TDetails tName={isLoading ? "Loading...." : isError ? "Invalid Address" : symbol as string} wAmnt={totalInWei} totalToken={formatEther(BigInt(totalInWei))} /> : null}
       <button
         type="submit"
-        className="mt-4 w-full rounded-md bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className={`mt-4 w-full rounded-md ${isPendingApprove ? 'bg-orange-400' : isPendingSendTokens ? 'bg-green-600' : isErrorApprove || isErrorSendTokens ? 'bg-red-500' : 'bg-blue-500'} px-6 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
       >
-        {account.isConnecting ? "Connecting..." : !account.isConnected ? "Please Connect Your Account" : btn}
+        {isPendingApprove || isPendingSendTokens?<Spinner/>:null}
+        {account.isConnecting ? "Connecting..." : !account.isConnected ? "Please Connect Your Account" : isPendingApprove ? "Approving..." : isPendingSendTokens ? "Sending Tokens..." : isErrorApprove || isErrorSendTokens ? "Err : See Console" : btn}
       </button>
     </form>
   );
 }
+
+
+
