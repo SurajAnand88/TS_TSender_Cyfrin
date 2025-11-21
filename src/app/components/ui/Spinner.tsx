@@ -1,6 +1,5 @@
 export function Spinner() {
     return (
-        // <div className="inline mx-2">
             <svg className={`size-5 animate-spin text-white inline box-border mx-2 mb-1`} viewBox="0 0 50 50">
 
             <circle
@@ -24,6 +23,5 @@ export function Spinner() {
                 stroke-dashoffset="60"
             />
         </svg>
-        // </div>
     )
 }
