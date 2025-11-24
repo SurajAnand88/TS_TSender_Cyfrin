@@ -48,6 +48,7 @@ export function AirdropForm() {
     setTokenAddress("");
     setAddresses("")
     setAmount("")
+    localStorage.clear();
   }
 
   const getSymbol = async () => {
@@ -176,23 +177,25 @@ export function AirdropForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-lg mx-auto p-4 border-solid border-3 rounded-lg border-blue-500 px-8 py-8 mt-23"
-    >
-      <Title></Title>
-      <TokenAddressInput value={tokenAddress} onChange={setTokenAddress} />
-      <AddressesInput value={addresses} onChange={setAddresses} />
-      <AmountInput value={amount} onChange={setAmount} />
-      {tokenAddress && addresses && amount ? <TDetails tName={isLoading ? "Loading...." : isError ? "Invalid Address" : symbol as string} wAmnt={totalInWei} totalToken={formatEther(BigInt(totalInWei))} /> : null}
-      <button
-        type="submit"
-        className={`mt-4 w-full rounded-md ${isPendingApprove ? 'bg-orange-400' : isPendingSendTokens ? 'bg-green-600' : isErrorApprove || isErrorSendTokens ? 'bg-red-500' : 'bg-blue-500'} px-6 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+    <>{account.isConnected ?
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-lg mx-auto p-4 border-solid border-3 rounded-lg border-blue-500 px-8 py-8 mt-23"
       >
-        {isPendingApprove || isPendingSendTokens?<Spinner/>:null}
-        {account.isConnecting ? "Connecting..." : !account.isConnected ? "Please Connect Your Account" : isPendingApprove ? "Approving..." : isPendingSendTokens ? "Sending Tokens..." : isErrorApprove || isErrorSendTokens ? "Err : See Console" : btn}
-      </button>
-    </form>
+        <Title></Title>
+        <TokenAddressInput value={tokenAddress} onChange={setTokenAddress} />
+        <AddressesInput value={addresses} onChange={setAddresses} />
+        <AmountInput value={amount} onChange={setAmount} />
+        {tokenAddress && addresses && amount ? <TDetails tName={isLoading ? "Loading...." : isError ? "Invalid Address" : symbol as string} wAmnt={totalInWei} totalToken={formatEther(BigInt(totalInWei))} /> : null}
+        <button
+          type="submit"
+          className={`mt-4 w-full rounded-md ${isPendingApprove ? 'bg-orange-400' : isPendingSendTokens ? 'bg-green-600' : isErrorApprove || isErrorSendTokens ? 'bg-red-500' : 'bg-blue-500'} px-6 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+        >
+          {isPendingApprove || isPendingSendTokens ? <Spinner /> : null}
+          {account.isConnecting ? "Connecting..." : !account.isConnected ? "Please Connect Your Account" : isPendingApprove ? "Approving..." : isPendingSendTokens ? "Sending Tokens..." : isErrorApprove || isErrorSendTokens ? "Err : See Console" : btn}
+        </button>
+      </form> : <h1 className="mt-23 text-black text-center italic text-2xl">Please connect your Wallet............</h1>}
+    </>
   );
 }
 
