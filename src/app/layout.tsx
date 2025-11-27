@@ -11,6 +11,7 @@ export default function RootLayout(props:{children:ReactNode}) {
   return (
     <html lang="en">
       <body> 
+        <title>TSender</title>
         <Providers>
           <Header />
           {props.children}
