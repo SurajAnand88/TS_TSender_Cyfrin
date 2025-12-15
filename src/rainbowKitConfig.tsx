@@ -2,6 +2,11 @@
 
 import {getDefaultConfig} from "@rainbow-me/rainbowkit";
 import {anvil, mainnet, zksync} from "wagmi/chains";
+// import dotenv from 'dotenv';
+
+// dotenv.config();
+
+// console.log(process.env.PROJECT_ID)
 
 export default getDefaultConfig({
     appName: "TSender",

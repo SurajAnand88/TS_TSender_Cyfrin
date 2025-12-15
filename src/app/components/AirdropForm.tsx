@@ -21,19 +21,20 @@ import { useQuery } from "@tanstack/react-query";
 import { convertStringToAddressArray, convertStringToNumbersArray } from "../constants/covertStringToArray/convert";
 import { useReadContractQuery, useWriteContractMutation } from "../constants/queryFunction/queryRequest";
 import { Spinner } from "./ui/Spinner";
+import { SocketAddress } from "node:net";
 
 
 
 
 
 export function AirdropForm() {
-  const [tokenAddress, setTokenAddress] = useState(localStorage.getItem("tokenAddress") || "");
-  const [addresses, setAddresses] = useState(localStorage.getItem("addresses") || "");
-  const [amount, setAmount] = useState(localStorage.getItem("amount") || "");
+  const [tokenAddress, setTokenAddress] = useState("");
+  const [addresses, setAddresses] = useState("");
+  const [amount, setAmount] = useState("");
   const [addressArray, setAddressArray] = useState<string[]>([]);
   const [amountArray, setAmountArray] = useState<number[]>([]);
   const [btn, setBtn] = useState("Send Tokens")
-  const [tokenSymbol, setTokenSymbol] = useState("");
+  const [tokenSymbol, setTokenSymbol] = useState(""); 
   const [totalInWei, setTotalInWei] = useState(0)
   const chainId = useChainId();
   const config = useConfig();
@@ -84,6 +85,12 @@ export function AirdropForm() {
   const sendTransaction = useWriteContractMutation({ mutationFn: sendTokens, addressArray: addressArray, amountArray: amountArray })
   const { data: sendHash, isError: isErrorSendTokens, isPending: isPendingSendTokens } = sendTransaction;
   const { data: approveHash, isPending: isPendingApprove, isError: isErrorApprove } = approveTransaction;
+
+  useEffect(() => {
+    setTokenAddress(localStorage.getItem("tokenAddress") || "");
+    setAddresses(localStorage.getItem("addresses") || "");
+    setAmount(localStorage.getItem("amount") || "");
+  })
 
   useEffect(() => {
     const total: number = calculateTotalAmount(amount);

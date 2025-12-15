@@ -6,6 +6,8 @@
     "anvil": "anvil --load-state anvil_state.json",
     "dev": "next dev",
     "build": "next build",
+    "clean": "npx rimraf .next node_modules/.cache",
+    "build-safe": "npm run clean && npm run build",
     "start": "next start",
     "test": "vitest",
     "playwright": "npx playwright test --ui"
@@ -30,7 +32,9 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
+    "baseline-browser-mapping": "^2.9.7",
     "jsdom": "^27.0.1",
+    "rimraf": "^6.1.2",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.0.8"
