@@ -34,10 +34,11 @@ test("should show the airdrop form if Connected, else not", async ({
 
   const customNetwork = {
     symbol: "ETH",
-    name: "Anvil",
+    name:"Anvil",
     rpcUrl: "http://localhost:8545",
     chainId: 31337,
-  };
+    
+  }
 
   await metaMask.addNetwork(customNetwork);
 
